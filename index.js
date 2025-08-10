@@ -33,10 +33,7 @@ Object.keys(db).forEach(modelName => {
 
 // Middleware
 app.use(express.json());
-app.use(cors({
-  origin: "http://localhost:3001", // atau sesuai URL frontend
-  credentials: true
-}));
+// ...removed duplicate CORS middleware...
 app.use('/uploads', express.static('uploads'));
 
 // Import routes
@@ -78,8 +75,8 @@ io.on("connection", (socket) => {
 
 // CORS configuration
 const ALLOWED_ORIGINS = [
-  process.env.FRONTEND_URL,   // domain utama frontend
-  /\.vercel\.app$/            // preview Vercel
+  'https://rental-mobil-ruby.vercel.app', // domain utama frontend Vercel
+  /\.vercel\.app$/                      // biar preview Vercel ikut lolos
 ];
 
 app.use(cors({
