@@ -1,104 +1,98 @@
-// Load env hanya di dev (biar .env lokal nggak override env Railway)
-if (process.env.NODE_ENV !== 'production') require('dotenv').config();
-
-const express = require('express');
-const http = require('http');
-const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
-
-const sequelize = require('./config/database');
+require("dotenv").config();
+const express = require("express");
+const http = require("http");
+const cors = require("cors");
+const path = require("path");
+const fs = require("fs");
+const sequelize = require("./config/database");
+const db = {};
+const app = express();
+const server = http.createServer(app);
 const { init } = require('./utils/socket');
 
-const app = express();
-
-// ===== CORS =====
-/**
- * Set di Railway → Variables:
- * FRONTEND_URL=https://rental-mobil-ruby.vercel.app
- * (opsional) FRONTEND_URL_PREVIEW_REGEX=\.vercel\.app$
- * (opsional) FRONTEND_URL_LOCAL=http://localhost:3001
- */
-const allowList = [
-  process.env.FRONTEND_URL,                       // prod vercel
-  process.env.FRONTEND_URL_LOCAL,                 // lokal
-].filter(Boolean);
-
-const previewRegex = process.env.FRONTEND_URL_PREVIEW_REGEX
-  ? new RegExp(process.env.FRONTEND_URL_PREVIEW_REGEX)
-  : /\.vercel\.app$/; // default: semua preview vercel
-
-app.use(cors({
-  origin(origin, cb) {
-    // izinkan tools tanpa origin (Postman/cURL)
-    if (!origin) return cb(null, true);
-    const ok = allowList.includes(origin) || previewRegex.test(origin);
-    cb(ok ? null : new Error('Not allowed by CORS'), ok);
-  },
-  credentials: true,
-  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
-  allowedHeaders: ['Content-Type','Authorization','X-Requested-With']
-}));
-app.options('*', cors());
-
-// (opsional) kalau pakai cookie/session di proxy
-app.set('trust proxy', 1);
-
-// ===== Static uploads =====
-const uploadDir = path.join(__dirname, 'uploads/payment_proofs');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-app.use('/uploads', express.static('uploads'));
-
-// ===== Parsers =====
-app.use(express.json());
-
-// ===== Routes =====
-app.use('/api/layanan', require('./routes/layanan'));
-app.use('/api/testimoni', require('./routes/testimoni'));
-app.use('/api/auth', require('./routes/authRoute'));
-app.use('/api/orders', require('./routes/orderRoutes'));
-app.use('/api/users', require('./routes/userRoute'));
-app.use('/api/notifications', require('./routes/notificationRoutes'));
-app.use('/api/payment', require('./routes/paymentRoutes'));
-
-app.get('/', (_, res) => res.send('Rental Mobil API is running'));
-
-// ===== HTTP server & Socket.IO (PAKAI SATU SERVER SAJA) =====
-const server = http.createServer(app);
+// Setup CORS sesuai kebutuhan frontend
 const io = init(server, {
   cors: {
-    origin: (origin, cb) => {
-      if (!origin) return cb(null, true);
-      const ok = allowList.includes(origin) || previewRegex.test(origin);
-      cb(ok ? null : new Error('Not allowed by CORS'), ok);
-    },
-    credentials: true,
-    methods: ['GET', 'POST']
+    origin: "http://localhost:3001", // ganti sesuai frontend
+    methods: ["GET", "POST"]
   }
 });
-app.set('io', io);
 
-io.on('connection', (socket) => {
-  console.log('User connected:', socket.id);
-  socket.on('disconnect', () => console.log('User disconnected:', socket.id));
+// Buat folder uploads/payment_proofs jika belum ada
+const uploadDir = path.join(__dirname, "uploads/payment_proofs");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log("Folder uploads/payment_proofs dibuat.");
+}
+
+Object.keys(db).forEach(modelName => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
 });
 
-// ===== Boot =====
+// Middleware
+app.use(express.json());
+app.use(cors({
+  origin: "http://localhost:3001", // atau sesuai URL frontend
+  credentials: true
+}));
+app.use('/uploads', express.static('uploads'));
+
+// Import routes
+const orderRoutes = require("./routes/orderRoutes");
+const layananRoutes = require("./routes/layanan");
+const testimoniRoutes = require("./routes/testimoni");
+const authRoutes = require("./routes/authRoute");
+const userRoutes = require("./routes/userRoute");
+const notificationRoutes = require('./routes/notificationRoutes');
+const paymentRoutes = require('./routes/paymentRoutes');
+
+
+
+// Gunakan route
+app.use("/api/layanan", layananRoutes);
+app.use("/api/testimoni", testimoniRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/users", userRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/payment', paymentRoutes);
+
+
+// Tes koneksi
+app.get("/", (req, res) => {
+  res.send("Rental Mobil API is running");
+});
+
+// Simpan io di app agar bisa diakses di controller
+app.set("io", io);
+
+// Contoh event koneksi
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
+
+// Jalankan server dan koneksi database
 (async () => {
   try {
     await sequelize.authenticate();
-    console.log('Database connected successfully');
+    console.log("Database connected successfully");
 
-    // HATI-HATI di production; kalau perlu matikan alter:
-    await sequelize.sync({ alter: false });
-    console.log('Database synced');
+    // Sinkronisasi model
+    await sequelize.sync({ alter: true });
+    console.log("Database synced");
 
+    // Jalankan server
     const PORT = process.env.PORT || 3000;
-    server.listen(PORT, () => {
-      console.log(`Server listening on :${PORT}`);
+    const server = app.listen(PORT, () => {
+      console.log(`Server running at http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error("Unable to connect to the database:", error);
     process.exit(1);
   }
 })();
