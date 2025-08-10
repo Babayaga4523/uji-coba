@@ -76,6 +76,26 @@ io.on("connection", (socket) => {
   });
 });
 
+// CORS configuration
+const ALLOWED_ORIGINS = [
+  process.env.FRONTEND_URL,   // domain utama frontend
+  /\.vercel\.app$/            // preview Vercel
+];
+
+app.use(cors({
+  origin(origin, cb) {
+    if (!origin) return cb(null, true); // allow Postman/cURL
+    const ok = ALLOWED_ORIGINS.some(r =>
+      r instanceof RegExp ? r.test(origin) : r === origin
+    );
+    cb(ok ? null : new Error('Not allowed by CORS'), ok);
+  },
+  credentials: true,
+  methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+  allowedHeaders: ['Content-Type','Authorization','X-Requested-With']
+}));
+app.options('*', cors()); // handle preflight
+
 // Jalankan server dan koneksi database
 (async () => {
   try {
