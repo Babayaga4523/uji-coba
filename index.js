@@ -33,8 +33,19 @@ Object.keys(db).forEach(modelName => {
 
 // Middleware
 app.use(express.json());
+const allowedOrigins = [
+  "http://localhost:3001",
+  "https://rental-mobil-ruby.vercel.app", // domain utama Vercel Anda
+  "https://rental-mobil-rcmr1udov-yoga-krisnas-projects.vercel.app" // domain preview Vercel (opsional, tambahkan jika perlu)
+];
+
 app.use(cors({
-  origin: "http://localhost:3001", // atau sesuai URL frontend
+  origin: function(origin, callback) {
+    // izinkan request tanpa origin (Postman, curl, dsb)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Not allowed by CORS"));
+  },
   credentials: true
 }));
 app.use('/uploads', express.static('uploads'));
