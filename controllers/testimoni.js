@@ -13,6 +13,7 @@ const testimoniController = {
 
   addTestimoni: async (req, res) => {
     try {
+      // user_id boleh null, jadi langsung create
       const newTestimoni = await Testimoni.create(req.body);
       res.status(201).json(newTestimoni);
     } catch (error) {

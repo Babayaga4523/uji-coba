@@ -11,7 +11,7 @@ const Testimoni = sequelize.define('Testimoni', {
   },
   user_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true, // ubah dari false ke true
     references: {
       model: 'user',
       key: 'id'
