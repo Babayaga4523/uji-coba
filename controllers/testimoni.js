@@ -13,8 +13,12 @@ const testimoniController = {
 
   addTestimoni: async (req, res) => {
     try {
-      // Jika user_id tidak valid, hapus dari payload
-      if (!req.body.user_id || isNaN(Number(req.body.user_id))) {
+      // Hapus user_id jika tidak valid (null, undefined, string kosong, bukan angka)
+      if (
+        !req.body.user_id ||
+        req.body.user_id === "" ||
+        isNaN(Number(req.body.user_id))
+      ) {
         delete req.body.user_id;
       }
       const newTestimoni = await Testimoni.create(req.body);
