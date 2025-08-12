@@ -1,5 +1,6 @@
 // controllers/testimoni.js
 const Testimoni = require('../models/testimoni');
+const User = require('../models/user'); // pastikan ada model user
 
 const testimoniController = {
   getAllTestimoni: async (req, res) => {
@@ -13,13 +14,19 @@ const testimoniController = {
 
   addTestimoni: async (req, res) => {
     try {
-      // Hapus user_id jika tidak valid (null, undefined, string kosong, bukan angka)
+      let { user_id } = req.body;
       if (
-        !req.body.user_id ||
-        req.body.user_id === "" ||
-        isNaN(Number(req.body.user_id))
+        !user_id ||
+        user_id === "" ||
+        isNaN(Number(user_id))
       ) {
         delete req.body.user_id;
+      } else {
+        // cek apakah user_id ada di tabel user
+        const user = await User.findByPk(user_id);
+        if (!user) {
+          return res.status(400).json({ error: "User ID tidak ditemukan" });
+        }
       }
       const newTestimoni = await Testimoni.create(req.body);
       res.status(201).json(newTestimoni);
