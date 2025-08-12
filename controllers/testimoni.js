@@ -13,7 +13,7 @@ const testimoniController = {
 
   addTestimoni: async (req, res) => {
     try {
-      // Hapus user_id jika tidak valid (null, undefinaaaaaed, string kosong, bukan angka)
+      // Hapus user_id jika tidak valid (null, undefined, string kosong, bukan angka)
       if (
         !req.body.user_id ||
         req.body.user_id === "" ||
