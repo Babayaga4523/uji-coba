@@ -35,8 +35,9 @@ Object.keys(db).forEach(modelName => {
 app.use(express.json());
 const allowedOrigins = [
   "http://localhost:3001",
-  "https://rental-mobil-ruby.vercel.app", // domain utama Vercel Anda
-  "https://rental-mobil-rcmr1udov-yoga-krisnas-projects.vercel.app" // domain preview Vercel (opsional, tambahkan jika perlu)
+  "https://rental-mobil-ruby.vercel.app",
+  "https://rental-mobil-rcmr1udov-yoga-krisnas-projects.vercel.app",
+  "https://uji-coba-production.up.railway.app" // tambahkan domain frontend Anda di sini
 ];
 
 app.use(cors({
