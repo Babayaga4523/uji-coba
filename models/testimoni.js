@@ -9,14 +9,7 @@ const Testimoni = sequelize.define('Testimoni', {
     primaryKey: true,
     autoIncrement: true
   },
-  user_id: {
-    type: DataTypes.INTEGER,
-    allowNull: null, // ubah dari false ke true
-    references: {
-      model: 'user',
-      key: 'id'
-    }
-  },
+  
   layanan_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
