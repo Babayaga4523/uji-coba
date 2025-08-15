@@ -3,6 +3,7 @@ exports.chat = async (req, res) => {
   try {
     const { message } = req.body;
     if (!message) {
+      console.log("No message in body:", req.body);
       return res.status(400).json({ error: "Message is required" });
     }
 
@@ -43,6 +44,7 @@ Tugas kamu adalah membantu pemilik atau admin dalam mengelola bisnis rental mobi
     const aiReply = data.choices?.[0]?.message?.content || "Maaf, terjadi kesalahan pada AI.";
     res.json({ response: aiReply });
   } catch (error) {
+    console.error("AI Chat error:", error);
     res.status(500).json({ error: error.message });
   }
 };
