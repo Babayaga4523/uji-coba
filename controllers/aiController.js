@@ -1,4 +1,7 @@
-const fetch = require("node-fetch");
+let fetch;
+(async () => {
+  fetch = (await import('node-fetch')).default;
+})();
 
 exports.chat = async (req, res) => {
   try {
