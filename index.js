@@ -9,6 +9,7 @@ const db = {};
 const app = express();
 const server = http.createServer(app);
 const { init } = require('./utils/socket');
+const authMiddleware = require('./middleware/authMiddleware');
 
 // Setup CORS sesuai kebutuhan frontend
 const io = init(server, {
@@ -110,3 +111,5 @@ io.on("connection", (socket) => {
     process.exit(1);
   }
 })();
+
+app.use(authMiddleware); // JANGAN lakukan ini untuk semua route!
