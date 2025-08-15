@@ -1,14 +1,13 @@
-let fetch;
-(async () => {
-  fetch = (await import('node-fetch')).default;
-})();
-
 exports.chat = async (req, res) => {
+  console.log("AI Chat called", req.body, req.user); // log user jika ada
   try {
     const { message } = req.body;
     if (!message) {
       return res.status(400).json({ error: "Message is required" });
     }
+
+    // Import node-fetch secara dinamis agar kompatibel dengan CommonJS
+    const fetch = (await import('node-fetch')).default;
 
     // Siapkan prompt system (bisa juga diterima dari frontend jika mau)
     const systemPrompt = `
