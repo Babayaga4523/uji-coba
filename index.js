@@ -9,7 +9,7 @@ const db = {};
 const app = express();
 const server = http.createServer(app);
 const { init } = require('./utils/socket');
-const authMiddleware = require('./middleware/authMiddleware');
+
 
 // Setup CORS sesuai kebutuhan frontend
 const io = init(server, {
