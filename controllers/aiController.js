@@ -1,7 +1,8 @@
-const fetch = require("node-fetch");
-
 exports.chat = async (req, res) => {
   try {
+    // Dynamic import agar kompatibel dengan CommonJS
+    const fetch = (await import('node-fetch')).default;
+
     const { message, systemPrompt } = req.body;
     if (!message) {
       return res.status(400).json({ error: "Message is required" });
