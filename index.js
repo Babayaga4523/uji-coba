@@ -112,4 +112,4 @@ io.on("connection", (socket) => {
   }
 })();
 
-app.use(authMiddleware); // JANGAN lakukan ini untuk semua route!
+
