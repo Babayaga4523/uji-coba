@@ -61,7 +61,7 @@ Statistik Website Saat Ini:
 - Pesanan Dibayar: ${stats?.paidOrders ?? 0}
     `.trim();
 
-    const model = "deepseek/deepseek-chat-v3-0324";
+    const model = "mistralai/mistral-small-3.1-24b-instruct:free";
     const messages = [
       { role: "system", content: prompt },
       { role: "user", content: message }
