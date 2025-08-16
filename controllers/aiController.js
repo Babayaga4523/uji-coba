@@ -61,7 +61,7 @@ Statistik Website Saat Ini:
 - Pesanan Dibayar: ${stats?.paidOrders ?? 0}
     `.trim();
 
-    const model = "openai/gpt-3.5-turbo";
+    const model = "deepseek/deepseek-chat-v3-0324";
     const messages = [
       { role: "system", content: prompt },
       { role: "user", content: message }
