@@ -47,5 +47,5 @@ router.get('/:id/history', async (req, res) => {
     res.status(500).json({ success: false, message: 'Gagal mengambil riwayat pesanan user', error: err.message });
   }
 });
-
+router.get("/admin/stats", require("../middleware/authMiddleware").authMiddleware, userController.getAdminStats);
 module.exports = router;

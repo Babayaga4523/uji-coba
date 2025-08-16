@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const path = require("path");
 const fs = require("fs");
+const { Order, Layanan } = require("../models");
 
 // Fungsi untuk register user
 const registerUser = async (req, res) => {
@@ -229,6 +230,29 @@ const uploadPhoto = async (req, res) => {
   }
 };
 
+// Fungsi untuk mengambil statistik admin
+const getAdminStats = async (req, res) => {
+  try {
+    const totalUsers = await User.count();
+    const totalOrders = await Order.count();
+    const totalRevenue = await Order.sum('total_price', { where: { status: 'completed' } }) || 0;
+    const totalCars = await Layanan.count();
+    const pendingOrders = await Order.count({ where: { status: 'pending' } });
+    const paidOrders = await Order.count({ where: { payment_status: 'paid' } });
+
+    res.json({
+      totalUsers,
+      totalOrders,
+      totalRevenue,
+      totalCars,
+      pendingOrders,
+      paidOrders
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // Export semua fungsi
 module.exports = {
   registerUser,
@@ -239,4 +263,5 @@ module.exports = {
   deleteUser,
   changePassword,
   uploadPhoto,
+  getAdminStats,
 };
