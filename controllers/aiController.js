@@ -61,7 +61,7 @@ Statistik Website Saat Ini:
 - Pesanan Dibayar: ${stats?.paidOrders ?? 0}
     `.trim();
 
-    const model = "openai/gpt-5-mini";
+    const model = "nousresearch/deepseek-llama-3-8b-deephermes-3";
     const messages = [
       { role: "system", content: prompt },
       { role: "user", content: message }
