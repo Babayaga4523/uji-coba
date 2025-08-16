@@ -1,8 +1,13 @@
-exports.chat = async (req, res) => {
-  try {
-    // Dynamic import agar kompatibel dengan CommonJS
-    const fetch = (await import('node-fetch')).default;
+const fetch = require("node-fetch");
 
+exports.chat = async (req, res) => {
+  console.log('AI_CHAT headers:', {
+    auth: req.headers.authorization ? 'present' : 'missing',
+    origin: req.headers.origin,
+  });
+  console.log('AI_CHAT body:', req.body);
+
+  try {
     const { message, systemPrompt } = req.body;
     if (!message) {
       return res.status(400).json({ error: "Message is required" });
@@ -30,12 +35,16 @@ Tugas kamu adalah membantu pemilik atau admin dalam mengelola bisnis rental mobi
         max_tokens: 1024
       })
     });
-
+    if (!response.ok) {
+      const text = await response.text().catch(() => '');
+      return res.status(502).json({
+        error: `OpenRouter error: ${response.status}`,
+        detail: text.slice(0, 500)
+      });
+    }
     const data = await response.json();
-
-    // Tangani error dari OpenRouter
     if (data.error) {
-      return res.status(500).json({ error: data.error.message || "AI error" });
+      return res.status(502).json({ error: data.error.message || 'AI error' });
     }
 
     // Kirim jawaban AI ke frontend
