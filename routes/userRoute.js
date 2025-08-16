@@ -47,5 +47,28 @@ router.get('/:id/history', async (req, res) => {
     res.status(500).json({ success: false, message: 'Gagal mengambil riwayat pesanan user', error: err.message });
   }
 });
-router.get("/admin/stats", require("../middleware/authMiddleware").authMiddleware, userController.getAdminStats);
+
+router.get('/admin/stats', async (req, res) => {
+  const db = require('../models');
+  try {
+    const totalUsers = await db.User.count();
+    const totalOrders = await db.Order.count();
+    const totalRevenue = await db.Order.sum('total_price', { where: { payment_status: 'paid' } }) || 0;
+    const totalCars = await db.Layanan.count();
+    const pendingOrders = await db.Order.count({ where: { status: 'pending' } });
+    const paidOrders = await db.Order.count({ where: { payment_status: 'paid' } });
+
+    res.json({
+      totalUsers,
+      totalOrders,
+      totalRevenue,
+      totalCars,
+      pendingOrders,
+      paidOrders
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;
