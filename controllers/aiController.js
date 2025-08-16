@@ -61,7 +61,7 @@ Statistik Website Saat Ini:
 - Pesanan Dibayar: ${stats?.paidOrders ?? 0}
     `.trim();
 
-    const model = "nvidia/llama-3.1-nemotron-ultra-253b-v1";
+    const model = "openai/gpt-3.5-turbo";
     const messages = [
       { role: "system", content: prompt },
       { role: "user", content: message }
