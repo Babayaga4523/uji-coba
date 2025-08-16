@@ -61,7 +61,7 @@ Statistik Website Saat Ini:
 - Pesanan Dibayar: ${stats?.paidOrders ?? 0}
     `.trim();
 
-    const model = "nousresearch/deepseek-llama-3-8b-deephermes-3";
+    const model = "nvidia/llama-3.1-nemotron-ultra-253b-v1:free";
     const messages = [
       { role: "system", content: prompt },
       { role: "user", content: message }
