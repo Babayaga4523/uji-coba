@@ -1,25 +1,24 @@
-const fetch = require("node-fetch");
-
 exports.chat = async (req, res) => {
-  console.log('AI_CHAT headers:', {
-    auth: req.headers.authorization ? 'present' : 'missing',
-    origin: req.headers.origin,
-  });
-  console.log('AI_CHAT body:', req.body);
-
   try {
+    // Dynamic import agar node-fetch v3+ bisa dipakai di CommonJS
+    const fetch = (await import("node-fetch")).default;
+
+    console.log('AI_CHAT headers:', {
+      auth: req.headers.authorization ? 'present' : 'missing',
+      origin: req.headers.origin,
+    });
+    console.log('AI_CHAT body:', req.body);
+
     const { message, systemPrompt } = req.body;
     if (!message) {
       return res.status(400).json({ error: "Message is required" });
     }
 
-    // Gunakan prompt system dari frontend jika ada
     const prompt = systemPrompt || `
 Kamu adalah AI asisten profesional untuk admin website rental mobil.
 Tugas kamu adalah membantu pemilik atau admin dalam mengelola bisnis rental mobil berbasis data dan strategi pemasaran digital.
     `.trim();
 
-    // Kirim ke OpenRouter
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -35,6 +34,7 @@ Tugas kamu adalah membantu pemilik atau admin dalam mengelola bisnis rental mobi
         max_tokens: 1024
       })
     });
+
     if (!response.ok) {
       const text = await response.text().catch(() => '');
       return res.status(502).json({
@@ -47,7 +47,6 @@ Tugas kamu adalah membantu pemilik atau admin dalam mengelola bisnis rental mobi
       return res.status(502).json({ error: data.error.message || 'AI error' });
     }
 
-    // Kirim jawaban AI ke frontend
     const aiReply = data.choices?.[0]?.message?.content || "Maaf, terjadi kesalahan pada AI.";
     res.json({ response: aiReply });
   } catch (error) {
