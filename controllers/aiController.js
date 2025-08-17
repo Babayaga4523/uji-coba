@@ -176,7 +176,7 @@ async function getAIResponseWithFallback(model, messages, maxTokens) {
       headers: {
         "Authorization": `Bearer ${(process.env.OPENROUTER_API_KEY || "").trim()}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://rental-mobil-ruby.vercel.app/",
+        "HTTP-Referer": "https://your-rental-app.com",
         "X-Title": "Rental Mobil AI Assistant"
       },
       body: JSON.stringify({
