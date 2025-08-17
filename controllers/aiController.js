@@ -176,7 +176,7 @@ async function getAIResponseWithFallback(model, messages, maxTokens) {
       headers: {
         "Authorization": `Bearer ${(process.env.OPENROUTER_API_KEY || "").trim()}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://your-rental-app.com",
+        "HTTP-Referer": "https://rental-mobil-ruby.vercel.app/",
         "X-Title": "Rental Mobil AI Assistant"
       },
       body: JSON.stringify({
@@ -283,7 +283,7 @@ async function getFallbackResponse(messages) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "mistralai/mistral-small-3.1-24b-instruct:free",
+        model: "nvidia/llama-3.1-nemotron-ultra-253b-v1:free",
         messages,
         max_tokens: 512
       })
