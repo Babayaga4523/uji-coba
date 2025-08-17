@@ -283,7 +283,7 @@ async function getFallbackResponse(messages) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "nvidia/llama-3.1-nemotron-ultra-253b-v1:free",
+        model: "mistralai/mistral-small-3.1-24b-instruct:free",
         messages,
         max_tokens: 512
       })
